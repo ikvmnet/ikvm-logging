@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.Build.NoTargets/3.5.6">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageProjectReference Include="..\IKVM.Extensions.Logging.Java.Util\IKVM.Extensions.Logging.Java.Util.csproj">
+            <PackageTargetPath>.</PackageTargetPath>
+        </PackageProjectReference>
+    </ItemGroup>
+
+</Project>

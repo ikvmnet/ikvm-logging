@@ -1,0 +1,4 @@
+major-version-bump-message: '\+semver:\s?(major)'
+minor-version-bump-message: '\+semver:\s?(minor)'
+patch-version-bump-message: '\+semver:\s?(patch)'
+mode: Mainline
