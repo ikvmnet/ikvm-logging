@@ -212,7 +212,7 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: nuget
-        path: dist
+        path: dist/nuget
     - name: Create Release
       if: github.ref_type == 'tag'
       uses: ncipollo/release-action@v1
