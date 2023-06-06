@@ -217,7 +217,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: ncipollo/release-action@v1
       with:
-        tag: ${{ github.ref_name }}
+        tag: ${{ steps.GitVersion.outputs.semVer }}
         allowUpdates: true
         artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
         draft: false
