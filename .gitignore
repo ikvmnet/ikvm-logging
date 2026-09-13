@@ -396,3 +396,9 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# output of IKVM.Logging.dist.msbuildproj
+/dist/
+
+# binary log written by the CI build
+/msbuild.binlog

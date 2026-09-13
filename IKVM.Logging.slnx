@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".github/workflows/IKVM.Logging.yml" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="GitVersion.yml" />
+    <File Path="global.json" />
+    <File Path="IKVM.Logging.dist.msbuildproj" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/IKVM.Extensions.Logging.Java.Util.Tests/IKVM.Extensions.Logging.Java.Util.Tests.csproj" />
+    <Project Path="src/IKVM.Extensions.Logging.Java.Util/IKVM.Extensions.Logging.Java.Util.csproj" />
+  </Folder>
+  <Folder Name="/src/dist/">
+    <Project Path="src/dist-nuget/dist-nuget.csproj" />
+    <Project Path="src/dist-tests/dist-tests.csproj" />
+  </Folder>
+</Solution>
