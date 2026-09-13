@@ -8,6 +8,7 @@
 
     <ItemGroup>
         <PackageReference Include="IKVM" Version="8.16.0" />
+        <PackageReference Include="IKVM.Maven.Sdk" Version="1.12.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
@@ -17,7 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\IKVM.Extensions.Logging.Java.Util\IKVM.Extensions.Logging.Java.Util.csproj" />
+        <ProjectReference Include="..\IKVM.Extensions.Logging.Slf4j\IKVM.Extensions.Logging.Slf4j.csproj" />
         <ProjectReference Include="..\IKVM.Extensions.Logging.TestUtilities\IKVM.Extensions.Logging.TestUtilities.csproj" />
     </ItemGroup>
 

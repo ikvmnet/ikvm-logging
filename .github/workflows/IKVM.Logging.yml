@@ -98,6 +98,7 @@ jobs:
       matrix:
         run:
         - IKVM.Extensions.Logging.Java.Util.Tests
+        - IKVM.Extensions.Logging.Slf4j.Tests
         sys:
         - win-x64
         - linux-x64

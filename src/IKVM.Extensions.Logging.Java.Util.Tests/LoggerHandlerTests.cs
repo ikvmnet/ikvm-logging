@@ -1,5 +1,7 @@
 using System;
 
+using IKVM.Extensions.Logging.TestUtilities;
+
 using java.util.logging;
 
 using Microsoft.Extensions.Logging;
