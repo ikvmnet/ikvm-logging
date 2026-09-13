@@ -1,88 +1,85 @@
 name: IKVM.Logging
 
 on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish this build to nuget.org, creating the GitHub release if one does not exist.
+        type: boolean
+        default: false
   push:
     branches:
     - main
+    - develop
   pull_request:
     branches:
     - main
+    - develop
+  release:
+    types:
+    - created
 
 jobs:
   build:
     name: Build
-    runs-on: windows-2022
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
         submodules: recursive
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v3
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v3
+        dotnet-version: 8.0.x
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 6.0.x
-    - name: Setup .NET 7.0
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
+        dotnet-version: 10.0.x
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0
+      uses: gittools/actions/gitversion/setup@v4
       with:
-        versionSpec: 5.x
+        versionSpec: 6.x
     - name: Execute GitVersion
-      uses: gittools/actions/gitversion/execute@v0
-      with:
-        useConfigFile: true
-    - name: Move NuGet Directory
-      shell: pwsh
-      run: Add-Content $env:GITHUB_ENV "`nNUGET_PACKAGES=${{ runner.temp }}\nuget\packages"
+      uses: gittools/actions/gitversion/execute@v4
+    # Every dependency this repository has is on nuget.org, so unlike the calcite repositories there is
+    # no nuget.config naming the organization feed and nothing to authenticate for a restore to succeed.
+    # The feed is still added here so a prerelease of IKVM or IKVM.Core.MSBuild that has not reached
+    # nuget.org yet can be picked up by version alone.
     - name: Add NuGet Source (GitHub)
       shell: pwsh
-      run: dotnet nuget add source --username USERNAME --password $env:GITHUB_TOKEN --store-password-in-clear-text --name ikvm $env:GITHUB_REPOS
+      run: dotnet nuget add source $env:GITHUB_REPOS --name ${{ github.repository_owner }} --username USERNAME --password $env:GITHUB_TOKEN --store-password-in-clear-text
       env:
         GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Cache NuGet
-      uses: actions/cache@v3
-      with:
-        path: ${{ runner.temp }}\nuget\packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**\*.csproj', '**\*.msbuildproj') }}-1
-        restore-keys: ${{ runner.os }}-nuget-
     - name: NuGet Restore
-      run: dotnet restore IKVM.Logging.sln
+      run: dotnet restore IKVM.Logging.slnx
     - name: Build
       run: |
-        dotnet msbuild /m /bl `
-          /p:Configuration="Release" `
-          /p:Platform="Any CPU" `
-          /p:Version=${env:GitVersion_FullSemVer} `
-          /p:AssemblyVersion=${env:GitVersion_AssemblySemVer} `
-          /p:InformationalVersion=${env:GitVersion_InformationalVersion} `
-          /p:FileVersion=${env:GitVersion_AssemblySemFileVer} `
-          /p:PackageVersion=${env:GitVersion_NuGetVersionV2} `
-          /p:RepositoryUrl="${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}.git" `
-          /p:PackageProjectUrl="${env:GITHUB_SERVER_URL}/${env:GITHUB_REPOSITORY}" `
-          /p:BuildInParallel=true `
-          /p:CreateHardLinksForAdditionalFilesIfPossible=true `
-          /p:CreateHardLinksForCopyAdditionalFilesIfPossible=true `
-          /p:CreateHardLinksForCopyFilesToOutputDirectoryIfPossible=true `
-          /p:CreateHardLinksForCopyLocalIfPossible=true `
-          /p:CreateHardLinksForPublishFilesIfPossible=true `
-          /p:ContinuousIntegrationBuild=true `
+        dotnet msbuild /m /bl \
+          /p:Configuration="Release" \
+          /p:Platform="Any CPU" \
+          /p:PreReleaseLabel=${GitVersion_PreReleaseLabel} \
+          /p:PreReleaseNumber=${GitVersion_WeightedPreReleaseNumber} \
+          /p:Version=${GitVersion_FullSemVer} \
+          /p:AssemblyVersion=${GitVersion_AssemblySemVer} \
+          /p:InformationalVersion=${GitVersion_InformationalVersion} \
+          /p:FileVersion=${GitVersion_AssemblySemFileVer} \
+          /p:PackageVersion=${GitVersion_FullSemVer} \
+          /p:RepositoryUrl="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git" \
+          /p:PackageProjectUrl="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+          /p:BuildInParallel=true \
+          /p:ContinuousIntegrationBuild=true \
           IKVM.Logging.dist.msbuildproj
     - name: Upload MSBuild Log
       if: ${{ always() }}
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: msbuild.binlog
         path: msbuild.binlog
     - name: Upload NuGet Packages
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: nuget
         path: dist/nuget
@@ -90,56 +87,41 @@ jobs:
       run: tar czvf tests.tar.gz tests
       working-directory: dist
     - name: Upload Tests
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: tests
         path: dist/tests.tar.gz
   test:
     strategy:
+      # One platform failing says nothing about the others, and the default cancels them.
+      fail-fast: false
       matrix:
         run:
         - IKVM.Extensions.Logging.Java.Util.Tests
         sys:
-        - windows
-        - linux
-        - macos
+        - win-x64
+        - linux-x64
+        - linux-arm64
+        - osx-x64
+        - osx-arm64
         tfm:
-        - net461
-        - netcoreapp3.1
-        - net6.0
-        - net7.0
-        exclude:
-        - tfm: net461
-          sys: linux
-        - tfm: net461
-          sys: macos
-        - tfm: netcoreapp3.1
-          sys: macos
+        - net8.0
+        - net10.0
     name: Test (${{ matrix.run }}:${{ matrix.tfm }}:${{ matrix.sys }})
     needs:
     - build
-    runs-on: ${{ fromJSON('{"windows":["windows-2022"],"linux":["ubuntu-22.04"],"macos":["macos-latest"]}')[matrix.sys] }}
+    runs-on: ${{ fromJSON('{"win-x86":["windows-2022"],"win-x64":["windows-2022"],"linux-x64":["ubuntu-24.04"],"linux-arm64":["ubuntu-24.04-arm"],"osx-x64":["macos-15-intel"],"osx-arm64":["macos-15"]}')[matrix.sys] }}
     steps:
-    - name: Setup .NET 3.1
-      uses: actions/setup-dotnet@v3
+    - name: Setup .NET 8.0
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 3.1.x
-    - name: Setup .NET 6.0
-      uses: actions/setup-dotnet@v3
+        dotnet-version: 8.0.x
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 6.0.x
-    - name: Setup .NET 7.0
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
-    - name: Add NuGet Source (GitHub)
-      shell: pwsh
-      run: dotnet nuget add source --username USERNAME --password $env:GITHUB_TOKEN --store-password-in-clear-text --name ikvm $env:GITHUB_REPOS
-      env:
-        GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        dotnet-version: 10.0.x
     - name: Download Tests
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v8
       with:
         name: tests
     - name: Restore Tests
@@ -162,75 +144,99 @@ jobs:
             $tst = $run
         }
 
-        # scan for test assemblies
-        $tests = $(gci .\tests\$tst\$tfm -Recurse -Filter '*.Tests.dll')
-
-        # if a query was specified, add to test command
+        # scan and process test assemblies
+        $tests = $(gi .\tests\$tst\$tfm\*.Tests.dll)
         if ($tests) {
+            $argl = @(
+                "-f", $tfm,
+                "-v:diag",
+                "--results-directory", "TestResults",
+                "--logger:console;verbosity=diag",
+                "--logger:trx"
+            )
+
+            $runsettings = $(gi .\tests\$tst\$tfm\*.runsettings)
+            if ($runsettings) {
+                $argl += "--settings:$runsettings"
+            }
+
             if ($qry -ne "" -and $qry -ne $null) {
+                $argl += @("--filter", $qry)
                 Add-Content $env:GITHUB_ENV "`nRET=TestResults--$tst-$qry--$tfm--$sys"
-                dotnet test -f $tfm --blame -v 2 --results-directory "TestResults" --logger:"console;verbosity=detailed" --logger:trx --collect "Code Coverage" --filter "$qry" $tests
             } else {
                 Add-Content $env:GITHUB_ENV "`nRET=TestResults--$tst--$tfm--$sys"
-                dotnet test -f $tfm --blame -v 2 --results-directory "TestResults" --logger:"console;verbosity=detailed" --logger:trx --collect "Code Coverage" $tests
             }
+
+            dotnet test @argl $tests[0].FullName
         }
     - name: Archive Test Results
       if: always() && startsWith(env.RET, 'TestResults--')
       run: tar czvf TestResults.tar.gz TestResults
-      working-directory: ${{ env.IKVMPATH }}
     - name: Upload Test Results
       if: always() && startsWith(env.RET, 'TestResults--')
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ env.RET }}
         path: TestResults.tar.gz
   release:
     name: Release
+    if: github.event_name != 'pull_request'
     needs:
     - test
     runs-on: ubuntu-latest
+    env:
+      # One switch for the GitHub release and the nuget.org push together, so neither happens without the
+      # other. Nothing reaches nuget.org implicitly: either a tag drives the build, or the run was asked
+      # for it by hand. The GitHub Packages push below is not gated by this and still runs on every build.
+      PUBLISH: ${{ github.ref_type == 'tag' || inputs.publish == true }}
     steps:
     - name: Checkout Source
-      uses: actions/checkout@v3
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
-    - name: Setup .NET 7.0
-      uses: actions/setup-dotnet@v3
+    - name: Setup .NET 10.0
+      uses: actions/setup-dotnet@v6
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 10.0.x
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0
+      uses: gittools/actions/gitversion/setup@v4
       with:
-        versionSpec: 5.x
+        versionSpec: 6.x
     - name: Execute GitVersion
       id: GitVersion
-      uses: gittools/actions/gitversion/execute@v0
-      with:
-        useConfigFile: true
+      uses: gittools/actions/gitversion/execute@v4
     - name: Download NuGet Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v8
       with:
         name: nuget
         path: dist/nuget
+    # `commit` is what lets this run from a branch: with no tag of this name yet the action creates one
+    # there, which is the tag that no longer has to be made by hand. Where the tag does already exist and
+    # carries a release -- an explicit tag build, or a re-run -- allowUpdates keeps that from failing and
+    # updates it in place instead, omitBodyDuringUpdate leaves notes written by hand alone, and
+    # replacesArtifacts refreshes the packages rather than colliding with the ones already attached.
     - name: Create Release
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: env.PUBLISH == 'true'
       uses: ncipollo/release-action@v1
       with:
         tag: ${{ steps.GitVersion.outputs.semVer }}
+        commit: ${{ github.sha }}
         allowUpdates: true
+        omitBodyDuringUpdate: true
+        replacesArtifacts: true
         artifacts: dist/nuget/*.nupkg,dist/nuget/*.snupkg
-        draft: false
-        makeLatest: true
+        prerelease: ${{ contains(steps.GitVersion.outputs.semVer, '-') }}
+        makeLatest: ${{ !contains(steps.GitVersion.outputs.semVer, '-') }}
         token: ${{ secrets.GITHUB_TOKEN }}
     - name: Push NuGet (GitHub)
+      if: github.event_name != 'pull_request'
       shell: pwsh
-      run: dotnet nuget push dist/nuget/*.nupkg --source $env:GITHUB_REPOS --api-key $env:GITHUB_TOKEN --skip-duplicate --no-symbols
+      run: dotnet nuget push dist/nuget/*.nupkg --source $env:GITHUB_REPOS --api-key $env:GITHUB_TOKEN --skip-duplicate
       env:
         GITHUB_REPOS: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Push NuGet
-      if: ${{ github.ref == 'refs/heads/main' }}
+      if: env.PUBLISH == 'true'
       shell: pwsh
       run: dotnet nuget push dist/nuget/*.nupkg --source $env:NUGET_REPOS --api-key $env:NUGET_TOKEN --skip-duplicate
       env:

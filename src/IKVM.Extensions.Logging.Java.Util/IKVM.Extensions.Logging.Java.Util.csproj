@@ -1,12 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net461;netcoreapp3.1</TargetFrameworks>
+        <TargetFramework>net8.0</TargetFramework>
+        <Description>A java.util.logging.Handler that forwards Java log records raised under IKVM to Microsoft.Extensions.Logging.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>ikvm;java;logging;java.util.logging;jul;microsoft.extensions.logging</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IKVM" Version="8.5.1" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
+        <PackageReference Include="IKVM" Version="8.16.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" Visible="false" />
     </ItemGroup>
 
 </Project>
