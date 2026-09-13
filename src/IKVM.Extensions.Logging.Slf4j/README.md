@@ -94,6 +94,9 @@ slf4j's levels and `LogLevel` agree rank for rank:
   renders scopes shows the same context slf4j would.
 - Markers are accepted and ignored; `Microsoft.Extensions.Logging` has nothing that corresponds to them.
 - An explicit `-Dslf4j.provider` naming some other provider is left alone by `Register`.
+- Nothing else needs wiring. `org.slf4j:slf4j-api` arrives through this package's own Maven dependency, so a
+  consumer needs no `MavenReference` of its own, and one that names slf4j itself at a different version
+  still binds — the closure merges. Both are covered by a consumer built against the package alone.
 
 ## How the provider is selected
 
