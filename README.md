@@ -44,11 +44,6 @@ slf4j does not. It resolves one provider per process, on first use, and construc
 the loggers slf4j hands out read the installed factory on every call, so a logger a Java library took into a
 static field before your container existed starts working the moment you install one.
 
-## Not here yet
-
-Serilog sinks for either API, which the `Microsoft.Extensions.Logging` bridges make unnecessary for most
-applications.
-
 ## Building
 
 - Build the **solution**: `dotnet build IKVM.Logging.slnx`.
