@@ -10,6 +10,9 @@
         <PackageProjectReference Include="..\IKVM.Extensions.Logging.Java.Util\IKVM.Extensions.Logging.Java.Util.csproj">
             <PackageTargetPath>.</PackageTargetPath>
         </PackageProjectReference>
+        <PackageProjectReference Include="..\IKVM.Extensions.Logging.Slf4j\IKVM.Extensions.Logging.Slf4j.csproj">
+            <PackageTargetPath>.</PackageTargetPath>
+        </PackageProjectReference>
     </ItemGroup>
 
 </Project>

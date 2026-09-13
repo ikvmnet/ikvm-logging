@@ -9,6 +9,8 @@
     <ItemGroup>
         <TestTarget Include="IKVM.Extensions.Logging.Java.Util.Tests|net8.0" ProjectName="IKVM.Extensions.Logging.Java.Util.Tests" TargetFramework="net8.0" />
         <TestTarget Include="IKVM.Extensions.Logging.Java.Util.Tests|net10.0" ProjectName="IKVM.Extensions.Logging.Java.Util.Tests" TargetFramework="net10.0" />
+        <TestTarget Include="IKVM.Extensions.Logging.Slf4j.Tests|net8.0" ProjectName="IKVM.Extensions.Logging.Slf4j.Tests" TargetFramework="net8.0" />
+        <TestTarget Include="IKVM.Extensions.Logging.Slf4j.Tests|net10.0" ProjectName="IKVM.Extensions.Logging.Slf4j.Tests" TargetFramework="net10.0" />
     </ItemGroup>
 
     <!-- Runs once per TFM/RID combination to generate individual output. -->

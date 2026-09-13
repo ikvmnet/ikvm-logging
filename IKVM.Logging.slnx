@@ -15,6 +15,9 @@
   <Folder Name="/src/">
     <Project Path="src/IKVM.Extensions.Logging.Java.Util.Tests/IKVM.Extensions.Logging.Java.Util.Tests.csproj" />
     <Project Path="src/IKVM.Extensions.Logging.Java.Util/IKVM.Extensions.Logging.Java.Util.csproj" />
+    <Project Path="src/IKVM.Extensions.Logging.Slf4j.Tests/IKVM.Extensions.Logging.Slf4j.Tests.csproj" />
+    <Project Path="src/IKVM.Extensions.Logging.Slf4j/IKVM.Extensions.Logging.Slf4j.csproj" />
+    <Project Path="src/IKVM.Extensions.Logging.TestUtilities/IKVM.Extensions.Logging.TestUtilities.csproj" />
   </Folder>
   <Folder Name="/src/dist/">
     <Project Path="src/dist-nuget/dist-nuget.csproj" />

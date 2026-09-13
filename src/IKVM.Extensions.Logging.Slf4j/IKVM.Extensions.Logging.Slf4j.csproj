@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Description>An slf4j provider that forwards the records logged by Java code running under IKVM to Microsoft.Extensions.Logging.</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>ikvm;java;logging;slf4j;microsoft.extensions.logging</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="IKVM" Version="8.16.0" />
+        <!-- Not PrivateAssets, deliberately. This package ships only buildTransitive, which is the folder that
+             carries build assets to consumers; marking it private disables the one mechanism it has, and a project
+             that references ours then compiles and fails at run time with `Could not load file or assembly
+             'slf4j.api'`. The default PrivateAssets keeps `build` to ourselves and lets buildTransitive through. -->
+        <PackageReference Include="IKVM.Maven.Sdk" Version="1.12.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- 2.0.9 is the floor: it is the release that added the `slf4j.provider` system property, which is how
+             this provider is selected. See Slf4jBridge for why ServiceLoader discovery is not an option here. -->
+        <MavenReference Include="org.slf4j:slf4j-api" Version="2.0.18" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\LICENSE.txt" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
+
+</Project>
