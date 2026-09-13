@@ -49,12 +49,14 @@ namespace IKVM.Extensions.Logging.Slf4j
         /// <remarks>
         /// The alternative, and what a provider shipped as a jar uses, is a
         /// <c>META-INF/services/org.slf4j.spi.SLF4JServiceProvider</c> entry found by <c>ServiceLoader</c>.
-        /// That does not work for a resource embedded in a .NET assembly: IKVM presents an assembly's manifest
-        /// resources as a flat set of names under one virtual directory, while its virtual file system walks a
-        /// lookup path one segment at a time, so a resource whose name contains a separator can be named by
-        /// <c>getResource</c> but never opened — <c>getResourceAsStream</c> answers null and
-        /// <c>ServiceLoader</c> fails with <c>Error reading configuration file</c>. Every <c>META-INF/services</c>
-        /// entry has separators in it by construction. Naming the class outright avoids the mechanism entirely.
+        /// That does not work for a resource embedded in a .NET assembly (ikvmnet/ikvm#752): IKVM presents an
+        /// assembly's manifest resources as a flat set of names under one virtual directory, while its virtual
+        /// file system walks a lookup path one segment at a time, so a resource whose name contains a
+        /// separator can be named by <c>getResource</c> but never opened — <c>getResourceAsStream</c> answers
+        /// null and <c>ServiceLoader</c> fails with <c>Error reading configuration file</c>. Every
+        /// <c>META-INF/services</c> entry has separators in it by construction. The supported way to place a
+        /// resource where Java can see it, a <c>JavaResource</c> item, exists only for an
+        /// <c>IKVM.NET.Sdk</c> project built from Java source. Naming the class outright avoids all of it.
         /// </remarks>
         public const string ProviderProperty = "slf4j.provider";
 

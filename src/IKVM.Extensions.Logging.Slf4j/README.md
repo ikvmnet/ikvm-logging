@@ -102,8 +102,10 @@ By the `slf4j.provider` system property, which names
 Java. `Slf4jBridge.Register` sets it.
 
 The usual mechanism, a `META-INF/services/org.slf4j.spi.SLF4JServiceProvider` entry found by `ServiceLoader`,
-is not available to a provider written in C#. IKVM presents an assembly's manifest resources as a flat set of
-names under one virtual directory, while its virtual file system resolves a lookup path one segment at a
-time — so a resource whose name contains a separator can be named by `getResource` but never opened, and
-`ServiceLoader` fails on it with `Error reading configuration file`. Every `META-INF/services` entry has
-separators in it by construction. Naming the class outright sidesteps the mechanism.
+is not available to a provider written in C# ([ikvmnet/ikvm#752](https://github.com/ikvmnet/ikvm/issues/752)).
+IKVM presents an assembly's manifest resources as a flat set of names under one virtual directory, while its
+virtual file system resolves a lookup path one segment at a time — so a resource whose name contains a
+separator can be named by `getResource` but never opened, and `ServiceLoader` fails on it with `Error reading
+configuration file`. Every `META-INF/services` entry has separators in it by construction. The supported way
+to place a resource where Java can see it, a `JavaResource` item, exists only for an `IKVM.NET.Sdk` project
+built from Java source. Naming the class outright sidesteps all of it.
