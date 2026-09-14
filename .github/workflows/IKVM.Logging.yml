@@ -45,7 +45,7 @@ jobs:
     - name: Install Mono
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends mono-complete
+        sudo apt-get install -y mono-runtime mono-devel
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v4
       with:
