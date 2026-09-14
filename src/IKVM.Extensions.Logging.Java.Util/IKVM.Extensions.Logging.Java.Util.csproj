@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net472;net8.0</TargetFrameworks>
         <Description>A java.util.logging.Handler that forwards Java log records raised under IKVM to Microsoft.Extensions.Logging.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>ikvm;java;logging;java.util.logging;jul;microsoft.extensions.logging</PackageTags>

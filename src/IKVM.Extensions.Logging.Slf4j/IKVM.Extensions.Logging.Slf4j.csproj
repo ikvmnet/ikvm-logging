@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFrameworks>net472;net8.0</TargetFrameworks>
         <Description>An slf4j provider that forwards the records logged by Java code running under IKVM to Microsoft.Extensions.Logging.</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>ikvm;java;logging;slf4j;microsoft.extensions.logging</PackageTags>
