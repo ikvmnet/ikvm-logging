@@ -37,6 +37,15 @@ jobs:
       uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
+    # The net472 leg of each library is compiled by the .NET Framework build of ikvmc, which IKVM selects
+    # itself: IKVM.MSBuild.targets sets IkvmToolFramework to net472 for any target compatible with net461.
+    # On Linux that importer runs under mono, and the ubuntu-24.04 image does not carry one, so the build
+    # fails with "Failed to start a process with file path 'mono'". Installing it is the supported way to
+    # cross-compile that leg here; the alternative is a Windows build job for one target framework.
+    - name: Install Mono
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y mono-runtime mono-devel
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v4
       with:
